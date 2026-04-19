@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import AddLead from "./AddLead";
@@ -10,42 +10,62 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // 🔐 Protect route
+  // ✅ Fetch leads (stable function)
+  const fetchLeads = useCallback(async () => {
+    try {
+      const res = await API.get("/leads");
+      setLeads(res.data);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    }
+  }, []);
+
+  // 🔐 Protect route + load data
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       navigate("/login");
     } else {
       fetchLeads();
     }
-  }, []);
+  }, [navigate, fetchLeads]);
 
-  const fetchLeads = async () => {
-    const res = await API.get("/leads");
-    setLeads(res.data);
-  };
-
+  // Update status
   const updateStatus = async (id, status) => {
-    await API.put(`/leads/${id}/status`, { status });
-    fetchLeads();
+    try {
+      await API.put(`/leads/${id}/status`, { status });
+      fetchLeads();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
+  // Add note
   const addNote = async (id) => {
     if (!noteText[id]) return;
 
-    await API.post(`/leads/${id}/notes`, { text: noteText[id] });
+    try {
+      await API.post(`/leads/${id}/notes`, { text: noteText[id] });
 
-    setNoteText({ ...noteText, [id]: "" });
-    fetchLeads();
+      setNoteText((prev) => ({
+        ...prev,
+        [id]: "",
+      }));
+
+      fetchLeads();
+    } catch (error) {
+      console.error("Error adding note:", error);
+    }
   };
 
-  // 🚪 Logout
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  // Filters
+  // Filter leads
   const filteredLeads =
     filter === "all"
       ? leads
@@ -94,13 +114,8 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div
-        style={{
-          flex: 1,
-          padding: "20px",
-          background: "#f1f5f9",
-        }}
-      >
+      <div style={{ flex: 1, padding: "20px", background: "#f1f5f9" }}>
+        
         <h1 style={{ marginBottom: 20 }}>Dashboard</h1>
 
         {/* Stats */}
@@ -134,7 +149,7 @@ export default function Dashboard() {
           <AddLead />
         </div>
 
-        {/* Leads */}
+        {/* Leads List */}
         <div style={{ marginTop: 20 }}>
           {filteredLeads.map((lead) => (
             <div key={lead._id} style={leadCard}>
@@ -182,16 +197,14 @@ export default function Dashboard() {
                     placeholder="Add note..."
                     value={noteText[lead._id] || ""}
                     onChange={(e) =>
-                      setNoteText({
-                        ...noteText,
+                      setNoteText((prev) => ({
+                        ...prev,
                         [lead._id]: e.target.value,
-                      })
+                      }))
                     }
                   />
 
-                  <button onClick={() => addNote(lead._id)}>
-                    Add
-                  </button>
+                  <button onClick={() => addNote(lead._id)}>Add</button>
                 </div>
 
                 <ul>
