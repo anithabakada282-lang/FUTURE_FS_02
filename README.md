@@ -5,42 +5,55 @@ This is a full-stack Client Lead Management System (Mini CRM) built as part of F
 
 The system allows businesses to manage leads, track their status, and add follow-up notes.
 
+---
+
 ## 🚀 Features
 - View all leads
+- Add new leads
 - Update lead status (New → Contacted → Converted)
 - Add follow-up notes
 - Dashboard with analytics
 - Secure login authentication
 
+---
+
 ## 🛠️ Tech Stack
-Frontend:
+
+### Frontend:
 - React.js
 - JavaScript
 - CSS
 
-Backend:
+### Backend:
 - Node.js
 - Express.js
 
-Database:
+### Database:
 - MongoDB
 
-## 📊 Dashboard
-- Total leads
+---
+
+## 📊 Dashboard Features
+- Total leads count
 - Contacted leads
 - Converted leads
+- Lead tracking system
+
+---
 
 ## 🔐 Authentication
-Token-based authentication using localStorage
+Token-based authentication using localStorage for session handling.
+
+---
 
 ## 🌐 Deployment
-Frontend: Vercel  
-Backend: (Add your deployed link here)
+- Frontend: Vercel  
+- Backend: (Add your deployed backend link here)
+
+---
 
 ## ⚙️ Setup Instructions
 
-### Frontend
+### 1. Clone Repository
 ```bash
-cd client
-npm install
-npm start
+git clone https://github.com/your-username/FUTURE_FS_02.git
